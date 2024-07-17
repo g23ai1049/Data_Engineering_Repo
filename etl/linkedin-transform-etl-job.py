@@ -4,6 +4,8 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
+from awsglue.dynamicframe import DynamicFrame
+from pyspark.sql.functions import explode, split, col
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 sc = SparkContext()
@@ -82,13 +84,14 @@ joined_data = Join.apply(
     'job_link'
 )
 
-# Cleaned and transformed data 
-def transform_skills(dynamic_frame):
-    df = dynamic_frame.toDF()
-    df = df.withColumn("skills", explode(split(col("job_skills"), ",")))
-    return DynamicFrame.fromDF(df, glueContext, "transformed_skills")
+# Convert to Spark DataFrame to use PySpark functions
+joined_data_df = joined_data.toDF()
 
-transformed_data = transform_skills(joined_data)
+# Split job_skills into individual skills
+transformed_data_df = joined_data_df.withColumn("skills", explode(split(col("job_skills"), ",")))
+
+# Convert back to DynamicFrame
+transformed_data = DynamicFrame.fromDF(transformed_data_df, glueContext, "transformed_data")
 
 # Save transformed data to S3
 glueContext.write_dynamic_frame.from_options(
