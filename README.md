@@ -8,10 +8,15 @@ The **Career Trends Analytics Engine** project aims to design and implement a sc
 - Data Aggregation
 - Data Visualization
 
+## Architecture Diagram
+Below is the high-level architecture diagram of the data engineering platform:
+
+![Architecture Diagram](Design Diagram.jpeg)
+
 ## Components
 ### Data Ingestion
-- **AWS Services:** AWS S3, AWS Glue
-- **Description:** Efficiently ingest large CSV files into the platform. AWS S3 is used for initial storage, and AWS Glue is used for ETL (Extract, Transform, Load) processes.
+- **AWS Services:** AWS S3, AWS Kinesis Data Streams, AWS Kinesis Firehose
+- **Description:** Efficiently ingest large CSV files into the platform. AWS S3 is used for initial storage, and AWS Kinesis Data Streams and Firehose are used for streaming data to S3.
 
 ### Data Storage
 - **AWS Services:** Amazon S3
@@ -60,5 +65,49 @@ LinkedIn is a widely used professional networking platform that hosts millions o
         - `job_link`
         - `job_summary`
 
-## Repository Structure
-- `etl/`: Con
+## Data Ingestion
+
+### Step 1: Create an S3 Bucket
+Create an S3 bucket to store raw data.
+
+### Step 2: Create a Kinesis Data Stream
+Create a Kinesis Data Stream to handle data ingestion.
+
+### Step 3: Create a Kinesis Firehose Delivery Stream
+Create a Kinesis Firehose Delivery Stream to deliver data from Kinesis Data Stream to Amazon S3.
+
+### Step 4: Set Up Data Producers
+Use the provided Python script to send data from CSV files to the Kinesis Data Stream.
+
+#### Python Script
+```python
+import boto3
+import csv
+import json
+import time
+
+# Initializing the Kinesis client
+kinesis_client = boto3.client('kinesis', region_name='ap-south-1')
+
+def send_data_to_kinesis(file_path, stream_name):
+    with open(file_path, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            kinesis_client.put_record(
+                StreamName=stream_name,
+                Data=json.dumps(row),
+                PartitionKey="partitionkey"
+            )
+            print(f"Sent record to Kinesis: {row}")
+            time.sleep(0.1)  
+
+# List of CSV file paths
+csv_files = [
+    'linkedin_job_postings.csv',
+    'job_skills.csv',
+    'job_summary.csv'
+]
+
+# Sending data from each CSV file to the Kinesis stream
+for csv_file in csv_files:
+    send_data_to_kinesis(csv_file, 'linkedin-job-stream')
