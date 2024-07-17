@@ -11,7 +11,7 @@ The **Career Trends Analytics Engine** project aims to design and implement a sc
 ## Architecture Diagram
 Below is the high-level architecture diagram of the data engineering platform:
 
-![Architecture Diagram](Design Diagram.jpeg)
+![Architecture Diagram]([Design Diagram.jpeg](https://github.com/g23ai1049/Data_Engineering_Repo/blob/main/Design%20Diagram))
 
 ## Components
 ### Data Ingestion
