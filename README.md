@@ -12,6 +12,7 @@ The **Career Trends Analytics Engine** project aims to design and implement a sc
 Below is the high-level architecture diagram of the data engineering platform:
 
 ![Architecture Diagram](https://github.com/g23ai1049/Data_Engineering_Repo/blob/main/Design_Diagram.jpg)
+
 ## Components
 ### Data Ingestion
 - **AWS Services:** AWS S3, AWS Kinesis Data Streams, AWS Kinesis Firehose
